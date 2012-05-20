@@ -32,6 +32,7 @@ function Maze(hCells, vCells) {
 	//populate visited with unvisited cells
 	this.hCells = hCells;
 	this.vCells = vCells;
+	this.currentCell = {x:0,y:0};
 	
 	//visited is a 2d array (dimensions hCells by vCells) for keeping track of
 	//which cells have been visited
@@ -108,6 +109,9 @@ function Maze(hCells, vCells) {
 	 * Generates the maze
 	 */
 	this.generate = function() {
+		//create maze entrance
+		this.hDoors[0][0] = true;
+		this.hDoors[hCells][vCells-1] = true;
 		var currentCell = {x:0,y:0};
 		this.visited[currentCell.x][currentCell.y] = true;
 		var stack = [];
@@ -179,6 +183,31 @@ function Maze(hCells, vCells) {
 		return {x: Math.floor(Math.random()*hCells),
 				y: Math.floor(Math.random()*vCells)};
 	}
+	
+	//attempts to move right. does nothing if current cell does not have a right door
+	this.moveRight = function() {
+		if (this.hDoors[this.currentCell.x+1][this.currentCell.y]) {
+			this.currentCell.x++;
+		}
+	}
+	
+	this.moveLeft = function() {
+		if (this.hDoors[this.currentCell.x][this.currentCell.y]) {
+			this.currentCell.x--;
+		}
+	}
+	
+	this.moveUp = function() {
+		if (this.vDoors[this.currentCell.x][this.currentCell.y]) {
+			this.currentCell.y--;
+		}
+	}
+	
+	this.moveDown = function() {
+		if (this.vDoors[this.currentCell.x][this.currentCell.y+1]) {
+			this.currentCell.y++;
+		}
+	}
 }
 
 function drawMaze() {
@@ -215,6 +244,11 @@ function drawMaze() {
 			}
 		}
 	}
+	//draw currentCell
+	ctx.fillStyle = 'red';
+	ctx.fillRect(wallThicknessPx + maze.currentCell.x * (cellSizePx+wallThicknessPx),
+			 wallThicknessPx + maze.currentCell.y * (cellSizePx+wallThicknessPx),
+			 cellSizePx,cellSizePx);
 }
 
 function generateMaze() {
@@ -253,4 +287,28 @@ $(function(){
 	$('#cellSizePx').change(generateMaze);
 	$('#wallThicknessPx').change(generateMaze);
 	generateMaze();
+	$(document).keydown(function(e){
+		if (e.keyCode == 37 || e.keyCode == 38 
+		 || e.keyCode == 39 || e.keyCode == 40) {
+			if (e.keyCode == 37) {
+				//left
+				console.log('left');
+				maze.moveLeft();
+			} else if (e.keyCode == 39) {
+				//right
+				console.log('right');
+				maze.moveRight();
+			} else if (e.keyCode == 38) {
+				//up
+				console.log('up');
+				maze.moveUp();
+			} else if (e.keyCode == 40) {
+				//down
+				console.log('down');
+				maze.moveDown();
+			}
+			drawMaze();
+			return false;
+		}
+	});
 });
