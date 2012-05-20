@@ -33,6 +33,7 @@ function Maze(hCells, vCells) {
 	this.hCells = hCells;
 	this.vCells = vCells;
 	this.currentCell = {x:0,y:0};
+	this.visitedCells = [];
 	
 	//visited is a 2d array (dimensions hCells by vCells) for keeping track of
 	//which cells have been visited
@@ -187,24 +188,28 @@ function Maze(hCells, vCells) {
 	//attempts to move right. does nothing if current cell does not have a right door
 	this.moveRight = function() {
 		if (this.hDoors[this.currentCell.x+1][this.currentCell.y]) {
+			this.visitedCells.push({x:this.currentCell.x,y:this.currentCell.y});
 			this.currentCell.x++;
 		}
 	}
 	
 	this.moveLeft = function() {
 		if (this.hDoors[this.currentCell.x][this.currentCell.y]) {
+			this.visitedCells.push({x:this.currentCell.x,y:this.currentCell.y});
 			this.currentCell.x--;
 		}
 	}
 	
 	this.moveUp = function() {
 		if (this.vDoors[this.currentCell.x][this.currentCell.y]) {
+			this.visitedCells.push({x:this.currentCell.x,y:this.currentCell.y});
 			this.currentCell.y--;
 		}
 	}
 	
 	this.moveDown = function() {
 		if (this.vDoors[this.currentCell.x][this.currentCell.y+1]) {
+			this.visitedCells.push({x:this.currentCell.x,y:this.currentCell.y});
 			this.currentCell.y++;
 		}
 	}
@@ -244,6 +249,13 @@ function drawMaze() {
 			}
 		}
 	}
+	//draw visitedCells
+	ctx.fillStyle = '#ddd';
+	for (var i=0; i<maze.visitedCells.length; ++i) {
+		ctx.fillRect(wallThicknessPx + maze.visitedCells[i].x * (cellSizePx+wallThicknessPx),
+				 wallThicknessPx + maze.visitedCells[i].y * (cellSizePx+wallThicknessPx),
+				 cellSizePx,cellSizePx);
+	}
 	//draw currentCell
 	ctx.fillStyle = 'red';
 	ctx.fillRect(wallThicknessPx + maze.currentCell.x * (cellSizePx+wallThicknessPx),
@@ -266,6 +278,7 @@ function generateMaze() {
 	canvas.height = wallThicknessPx + maze.vCells * (cellSizePx + wallThicknessPx);
 	ctx = canvas.getContext('2d');
 	ctx.fillStyle = 'black';
+	ctx.fillRect(0,0,canvas.width,canvas.height);
 	maze.generate();
 	drawMaze();
 	var canvasData = canvas.toDataURL("image/png");
