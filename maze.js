@@ -32,17 +32,49 @@ function Maze(hCells, vCells) {
 	//populate visited with unvisited cells
 	this.hCells = hCells;
 	this.vCells = vCells;
+	
+	//visited is a 2d array (dimensions hCells by vCells) for keeping track of
+	//which cells have been visited
 	this.visited = [];
-	//doors are pathways between cells (broken walls)
-	//struct Door { Cell c1; Cell c2; };
-	//struct Cell { int x; int y; };
-	this.doors = []; 
 	for (var i=0; i<this.hCells; ++i) {
 		var row = [];
 		for (var j=0; j<this.vCells; ++j) {
 			row.push(false);
 		}
 		this.visited.push(row);
+	}
+	
+	//hDoors and vDoors are 2d arrays representing
+	//pathways between cells. By default, each cell is surrounded by 
+	//four walls. Walls can be broken by creating a horizontal or vertical door.
+	//true means door exists. false means door does not exist, i.e. wall.
+	
+	//hDoors (dimensions hCells+1 by vCells)
+	//hDoors[0][0] is the left door of cell (0,0)
+	//hDoors[1][0] is the right door of cell (0,0) and left door of cell (1,0)
+	//hDoors[hCells][0] is the right door of cell (hCells-1,0)
+	//hDoors[hCells][vCells-1] is the right door of cell (hCells-1,vCells-1)
+	this.hDoors = [];
+	for (var i=0; i<this.hCells+1; ++i) {
+		var row = []
+		for (var j=0; j<this.vCells; ++j) {
+			row.push(false);
+		}
+		this.hDoors.push(row);
+	}
+	
+	//vDoors (dimensions hCells by vCells+1)
+	//vDoors[0][0] is the top door of cell (0,0)
+	//vDoors[0][1] is the bottom door of cell (0,0) and the top door of cell (0,1)
+	//vDoors[0][vCells] is the bottom door of cell (0,vCells-1)
+	//vDoors[hCells-1][vCells] is the bottom door of cell (hCells-1,vCells-1)
+	this.vDoors = [];
+	for (var i=0; i<this.hCells; ++i) {
+		var row = []
+		for (var j=0; j<this.vCells+1; ++j) {
+			row.push(false);
+		}
+		this.vDoors.push(row);
 	}
 	
 	/**
@@ -58,9 +90,18 @@ function Maze(hCells, vCells) {
 	
 	this.addDoor = function(cell1,cell2) {
 		//console.log('adding door between (' + cell1.x + ',' + cell1.y + ')'
-		//	+ ' and (' + cell2.x + ',' + cell2.y + ')');
-		this.doors.push({c1:{x:cell1.x,y:cell1.y},
-						 c2:{x:cell2.x,y:cell2.y}});
+		//	+ ' and (' + cell2.x + ',' + cell2.y + ')');						 
+		if (cell1.y == cell2.y) {
+			//add an hDoor
+			var maxX = max(cell1.x, cell2.x);
+			this.hDoors[maxX][cell1.y] = true;
+		} else if (cell1.x == cell2.x) {
+			//add a vDoor
+			var maxY = max(cell1.y, cell2.y);
+			this.vDoors[cell1.x][maxY] = true;
+		} else {
+			throw "CellsArentAdjacentCannotCreateDoor";
+		}
 	}
 	
 	/**
@@ -74,7 +115,7 @@ function Maze(hCells, vCells) {
 			var unvisitedNeighbors = this.getUnvisitedNeighbors(currentCell.x, currentCell.y);
 			if (unvisitedNeighbors.length > 0) {
 				var nextCell = randomChoice(unvisitedNeighbors);
-				console.log('visiting (' + nextCell.x + ',' + nextCell.y + ')');
+				//console.log('visiting (' + nextCell.x + ',' + nextCell.y + ')');
 				this.visited[nextCell.x][nextCell.y] = true;
 				stack.push(nextCell);
 				//break the wall between currentCell and nextCell
@@ -143,6 +184,7 @@ function Maze(hCells, vCells) {
 function drawMaze() {
 	ctx.fillStyle = 'black';
 	ctx.fillRect(0,0,canvas.width,canvas.height);
+	//draw cells
 	for (var i=0; i<maze.hCells; ++i) {
 		for (var j=0; j<maze.vCells; ++j) {
 			ctx.fillStyle = 'white';
@@ -153,30 +195,24 @@ function drawMaze() {
 			}
 		}
 	}
-	//draw doors
-	for (var i=0; i<maze.doors.length; ++i) {
-		var door = maze.doors[i];
-		ctx.fillStyle = 'white';
-		//the two cells joined by a door are either side by side (same y value)
-		//or on top of one another (same x value)
-		if (door.c1.y == door.c2.y) {
-			//side by side
-			//console.log('side by side');
-			//find min x
-			var minX = min(door.c1.x, door.c2.x);
-			//draw door
-			ctx.fillRect((minX+1) * (cellSizePx+wallThicknessPx), 
-			wallThicknessPx + door.c1.y * (cellSizePx+wallThicknessPx), 
-			wallThicknessPx, cellSizePx);
-		} else if (door.c1.x == door.c2.x) {		
-			//on top of one another
-			//console.log('on top of one another');
-			//find min y
-			var minY = min(door.c1.y, door.c2.y);
-			//draw door
-			ctx.fillRect(wallThicknessPx + door.c1.x * (cellSizePx+wallThicknessPx), 
-			 (minY+1) * (cellSizePx+wallThicknessPx), 
-			 cellSizePx, wallThicknessPx);
+	//draw hDoors
+	for (var i=0; i<maze.hDoors.length; ++i) {
+		for (var j=0; j<maze.hDoors[i].length; ++j) {
+			if (maze.hDoors[i][j]) {
+				ctx.fillRect(i * (cellSizePx+wallThicknessPx), 
+				wallThicknessPx + j * (cellSizePx+wallThicknessPx), 
+				wallThicknessPx, cellSizePx);
+			}
+		}
+	}
+	//draw vDoors
+	for (var i=0; i<maze.vDoors.length; ++i) {
+		for (var j=0; j<maze.vDoors[i].length; ++j) {
+			if (maze.vDoors[i][j]) {
+				ctx.fillRect(wallThicknessPx + i * (cellSizePx+wallThicknessPx), 
+				j * (cellSizePx+wallThicknessPx), 
+				cellSizePx, wallThicknessPx);
+			}
 		}
 	}
 }
