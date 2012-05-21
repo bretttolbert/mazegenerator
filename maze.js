@@ -216,6 +216,10 @@ function Maze(hCells, vCells) {
 }
 
 function drawMaze() {
+	cellSizePx = parseInt($('#cellSizePx').val(), 10);
+	wallThicknessPx = parseInt($('#wallThicknessPx').val(), 10);
+	canvas.width = wallThicknessPx + maze.hCells * (cellSizePx + wallThicknessPx);
+	canvas.height = wallThicknessPx + maze.vCells * (cellSizePx + wallThicknessPx);
 	ctx.fillStyle = 'black';
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	//draw cells
@@ -252,9 +256,13 @@ function drawMaze() {
 	//draw visitedCells
 	ctx.fillStyle = '#ddd';
 	for (var i=0; i<maze.visitedCells.length; ++i) {
-		ctx.fillRect(wallThicknessPx + maze.visitedCells[i].x * (cellSizePx+wallThicknessPx),
-				 wallThicknessPx + maze.visitedCells[i].y * (cellSizePx+wallThicknessPx),
-				 cellSizePx,cellSizePx);
+		var x = wallThicknessPx + maze.visitedCells[i].x * (cellSizePx+wallThicknessPx);
+		var y = wallThicknessPx + maze.visitedCells[i].y * (cellSizePx+wallThicknessPx)
+		ctx.fillRect(x,y,cellSizePx,cellSizePx);
+		//ctx.beginPath();
+		//ctx.arc(x+cellSizePx/2, y+cellSizePx/2, cellSizePx/4, 0, Math.PI*2, true); 
+		//ctx.closePath();
+		//ctx.fill();
 	}
 	//draw currentCell
 	ctx.fillStyle = 'red';
@@ -265,13 +273,7 @@ function drawMaze() {
 
 function generateMaze() {
 	hCells = parseInt($('#hCells').val(), 10);
-	console.log('hCells='+hCells);
 	vCells = parseInt($('#vCells').val(), 10);
-	console.log('vCells='+vCells);
-	cellSizePx = parseInt($('#cellSizePx').val(), 10);
-	console.log('cellSizePx='+cellSizePx);
-	wallThicknessPx = parseInt($('#wallThicknessPx').val(), 10);
-	console.log('wallThicknessPx='+wallThicknessPx);
 	maze = new Maze(hCells, vCells);
 	canvas = $('#canvas')[0];
 	canvas.width = wallThicknessPx + maze.hCells * (cellSizePx + wallThicknessPx);
@@ -295,10 +297,11 @@ function generateMaze() {
 }
 
 $(function(){
+	$('#generate').click(generateMaze);
 	$('#hCells').change(generateMaze);
 	$('#vCells').change(generateMaze);
-	$('#cellSizePx').change(generateMaze);
-	$('#wallThicknessPx').change(generateMaze);
+	$('#cellSizePx').change(drawMaze);
+	$('#wallThicknessPx').change(drawMaze);
 	generateMaze();
 	$(document).keydown(function(e){
 		if (e.keyCode == 37 || e.keyCode == 38 

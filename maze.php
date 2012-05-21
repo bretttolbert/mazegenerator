@@ -10,6 +10,7 @@
 <label for="vCells">vCells</label><input type="text" id="vCells" value="32"/><br/>
 <label for="hCells">cellSizePx</label><input type="text" id="cellSizePx" value="16"/><br/>
 <label for="hCells">wallThicknessPx</label><input type="text" id="wallThicknessPx" value="4"/><br/>
+<input type="button" id="generate" value="Generate"/>
 <div id="saveLink"></div>
 </body>
 </html>
