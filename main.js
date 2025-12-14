@@ -142,8 +142,9 @@ function setVCells(val) {
     $('#vCells').val(val);
 }
 
+var audioPowerup = new Audio('sounds/powerup.mp3');
+
 function levelUp() {
-    var audioPowerup = new Audio('sounds/powerup.mp3');
     audioPowerup.play();
     setVCells(vCells + 1);
     setHCells(hCells + 1);
