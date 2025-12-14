@@ -87,7 +87,17 @@ function drawMaze() {
              cellSizePx,cellSizePx);
 }
 
-function generateMaze() {
+function generateMaze(prompt_for_confirm) {
+
+    if (prompt_for_confirm) {
+        let text = "Regenerate maze? Are you sure?\nPress OK or Cancel.";
+        if (!confirm(text)) {
+            return;
+        }
+    }
+
+    currentCell = {x:0,y:0};
+    visitedCells = [];
     hCells = parseInt($('#hCells').val(), 10);
     vCells = parseInt($('#vCells').val(), 10);
     maze = new Maze(hCells, vCells);
@@ -114,11 +124,50 @@ function generateMaze() {
     }
 }
 
+function regenerateMaze() {
+    generateMaze(true);
+}
+
+function regenerateMazeNoConfirm() {
+    generateMaze(false);
+}
+
+function setHCells(val) {
+    hCells = val;
+    $('#hCells').val(val);
+}
+
+function setVCells(val) {
+    vCells = val;
+    $('#vCells').val(val);
+}
+
+function levelUp() {
+    var audioPowerup = new Audio('sounds/powerup.mp3');
+    audioPowerup.play();
+    setVCells(vCells + 1);
+    setHCells(hCells + 1);
+    regenerateMazeNoConfirm();
+}
+
+//check if user has won the game by reaching the exit
+function checkFoundExit() {
+    if (currentCell.x < 0 || currentCell.y < 0 || currentCell.x >= hCells || currentCell.y >= vCells) {
+        if (vCells >= 32) {
+            alert("You won the game!");
+            window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        } else {
+            levelUp();
+        }
+    }
+}
+
 //attempts to move right. does nothing if current cell does not have a right door
 function moveRight() {
     if (maze.hDoors[currentCell.x+1][currentCell.y]) {
         visitedCells.push({x:currentCell.x,y:currentCell.y});
         currentCell.x++;
+        checkFoundExit();
     }
 }
 
@@ -126,6 +175,7 @@ function moveLeft() {
     if (maze.hDoors[currentCell.x][currentCell.y]) {
         visitedCells.push({x:currentCell.x,y:currentCell.y});
         currentCell.x--;
+        checkFoundExit();
     }
 }
 
@@ -133,6 +183,7 @@ function moveUp() {
     if (maze.vDoors[currentCell.x][currentCell.y]) {
         visitedCells.push({x:currentCell.x,y:currentCell.y});
         currentCell.y--;
+        checkFoundExit();
     }
 }
 
@@ -140,16 +191,43 @@ function moveDown() {
     if (maze.vDoors[currentCell.x][currentCell.y+1]) {
         visitedCells.push({x:currentCell.x,y:currentCell.y});
         currentCell.y++;
+        checkFoundExit();
     }
 }
 
+function handleClickBtnUp() {
+    moveUp();
+    drawMaze();
+}
+
+function handleClickBtnDown() {
+    moveDown();
+    drawMaze();
+}
+
+function handleClickBtnLeft() {
+    moveLeft();
+    drawMaze();
+}
+
+function handleClickBtnRight() {
+    moveRight();
+    drawMaze();
+}
+
+
+
 $(function(){
-    $('#generate').click(generateMaze);
-    $('#hCells').change(generateMaze);
-    $('#vCells').change(generateMaze);
+    $('#generateBtn').click(regenerateMaze);
+    $('#upBtn').click(handleClickBtnUp);
+    $('#downBtn').click(handleClickBtnDown);
+    $('#leftBtn').click(handleClickBtnLeft);
+    $('#rightBtn').click(handleClickBtnRight);
+    //$('#hCells').change(regenerateMaze);
+    //$('#vCells').change(regenerateMaze);
     $('#cellSizePx').change(drawMaze);
     $('#wallThicknessPx').change(drawMaze);
-    generateMaze();
+    regenerateMazeNoConfirm();
     $(document).keydown(function(e){
         if (e.keyCode == 37 || e.keyCode == 38 
          || e.keyCode == 39 || e.keyCode == 40) {

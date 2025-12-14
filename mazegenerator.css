@@ -1,0 +1,55 @@
+body {
+  touch-action: manipulation;
+  font-family: sans-serif;
+}
+
+input {
+  height: 128px;
+  font-size: 32px;
+}
+
+input[type="text"] {
+  width: 128px;
+  padding-right: 10px;
+  line-height: 1.5;
+  border: 1px solid #ccc;
+  border-radius: 5px; /* Adds rounded corners */
+  background-color: #fff;
+  color: #333;
+  box-sizing: border-box; /* Ensures padding/border are included in width calculation */
+  margin-top: 2px;
+}
+
+input[type="button"] {
+  min-width: 64px;
+}
+
+#generateBtn {
+  width: 100%;
+}
+
+#upBtn, #downBtn {
+  width: 100%;
+}
+
+#leftBtn, #rightBtn {
+  width: 50%;
+}
+
+#leftBtn {
+  float: left;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th {
+  vertical-align: bottom;
+  margin-bottom: 0;
+}
+
+td, th {
+  width: 25%;
+  text-align: left;
+}

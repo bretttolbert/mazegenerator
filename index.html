@@ -1,18 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZV168PZBJC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZV168PZBJC');
+</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 <script src="Maze.js"></script>
 <script src="main.js"></script>
+<link rel="stylesheet" href="mazegenerator.css">
+<meta name="viewport" content="width=720px, initial-scale=0.5, user-scalable=no">
 </head>
 <body>
-<canvas id="canvas"></canvas>
-<br/>
-<label for="hCells">hCells</label><input type="text" id="hCells" value="32"/><br/>
-<label for="vCells">vCells</label><input type="text" id="vCells" value="32"/><br/>
-<label for="hCells">cellSizePx</label><input type="text" id="cellSizePx" value="16"/><br/>
-<label for="hCells">wallThicknessPx</label><input type="text" id="wallThicknessPx" value="4"/><br/>
-<input type="button" id="generate" value="Generate"/>
-<div id="saveLink"></div>
+  <header>
+      <table>
+        <tr>
+          <th>H Cells</th>
+          <th>V Cells</th>
+          <th>Cell Size (px)</th>
+          <th>Wall Thickness (px)</th>
+        </tr>
+        <tr>
+          <td><input type="text" id="hCells" value="4"/></td>
+          <td><input type="text" id="vCells" value="4"/></td>
+          <td><input type="text" id="cellSizePx" value="16"/></td>
+          <td><input type="text" id="wallThicknessPx" value="4"/></td>
+        </tr>
+      </table><br/>
+      <div id="saveLink"></div>
+  </header>
+  <main>
+    <div id="wrapper">
+    <canvas id="canvas"></canvas>
+    <br/>
+    </div>
+  </main>
+  <footer>
+    <input type="button" id="generateBtn" value="Regenerate"/>
+    <input type="button" id="upBtn" value="Up"/>
+    <input type="button" id="leftBtn" value="Left"/>
+    <input type="button" id="rightBtn" value="Right"/>
+    <input type="button" id="downBtn" value="Down"/>
+  </footer>
 </body>
 </html>
